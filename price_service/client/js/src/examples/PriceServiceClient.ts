@@ -7,36 +7,22 @@ function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-const argv = yargs(hideBin(process.argv))
-  .option("endpoint", {
-    description:
-      "Endpoint URL for the price service. e.g: https://endpoint/example",
-    type: "string",
-    required: true,
-  })
-  .option("price-ids", {
-    description:
-      "Space separated price feed ids (in hex without leading 0x) to fetch." +
-      " e.g: f9c0172ba10dfa4d19088d...",
-    type: "array",
-    required: true,
-  })
-  .help()
-  .alias("help", "h")
-  .parserConfiguration({
-    "parse-numbers": false,
-  })
-  .parseSync();
+const priceIds = [
+  "0xe62df6c8b4a85fe1a67db44dc12de5db330f7ac66b72dc658afedf0f4a415b43", // BTC/USD price id
+  "0xff61491a931112ddf1bd8147cd1b641375f79f5825126d665480874634fd0ace", // ETH/USD price id
+];
+const endpoint = "";
+
 
 async function run() {
-  const connection = new PriceServiceConnection(argv.endpoint, {
+  const connection = new PriceServiceConnection(endpoint, {
     logger: console, // Providing logger will allow the connection to log it's events.
     priceFeedRequestConfig: {
       binary: true,
     },
   });
 
-  const priceIds = argv.priceIds as string[];
+  const priceIds = priceIds as string[];
   const priceFeeds = await connection.getLatestPriceFeeds(priceIds);
   console.log(priceFeeds);
   console.log(priceFeeds?.at(0)?.getPriceNoOlderThan(60));
